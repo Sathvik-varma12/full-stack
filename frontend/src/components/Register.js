@@ -1,21 +1,25 @@
 import React, { useState } from "react";
-import  api  from "../api";
+import api from "../api";
 
-const Register = () => {
+const Register = ({ onSwitch }) => {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
 
   const handleRegister = async () => {
-    const {user, email, password} = form
-    if(!user || !email || !password){
-      alert("Please enter the values properly dumboo")
-      return
+    const { name, email, password } = form;
+    if (!name || !email || !password) {
+      alert("Please enter all details");
+      return;
     }
-    console.log(form)
-    const res = await api.register(form);
-    console.log(res)
-    const data = await res.data;
-    if (res.status === 200) alert("Registered successfully! Please login.");
-    else alert(data.message);
+
+    try {
+      const res = await api.register(form);
+      if (res.status === 200) {
+        alert("Registered successfully! Please login.");
+        onSwitch(); // Switch back to login screen
+      }
+    } catch (error) {
+      alert(error.response?.data?.message || "Registration failed");
+    }
   };
 
   return (
@@ -24,7 +28,17 @@ const Register = () => {
       <input placeholder="Name" onChange={(e) => setForm({ ...form, name: e.target.value })} /><br /><br />
       <input placeholder="Email" onChange={(e) => setForm({ ...form, email: e.target.value })} /><br /><br />
       <input placeholder="Password" type="password" onChange={(e) => setForm({ ...form, password: e.target.value })} /><br /><br />
-      <button type="submit" onClick={handleRegister}>Register</button>
+      <button onClick={handleRegister}>Register</button>
+      <br /><br />
+      <p>
+        Already have an account?{" "}
+        <span
+          style={{ color: "blue", cursor: "pointer", textDecoration: "underline" }}
+          onClick={onSwitch}
+        >
+          Login here
+        </span>
+      </p>
     </div>
   );
 };

@@ -1,24 +1,24 @@
 import React, { useState } from "react";
-import  api  from "../api";
+import api from "../api";
 
-const Login = ({ onLogin }) => {
+const Login = ({ onLogin, onSwitch }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    if(!email || !password){
-      alert("enter email id and password")
-      return
+    if (!email || !password) {
+      alert("Enter email id and password");
+      return;
     }
-    const res = await api.login({ email, password });
-    console.log(res)
-    const data = await res.data;
-    if (res.status === 200) {
+    try {
+      const res = await api.login({ email, password });
+      const data = res.data;
+
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       onLogin(data.user);
-    } else {
-      alert(data.message);
+    } catch (error) {
+      alert(error.response?.data?.message || "Login failed");
     }
   };
 
@@ -28,6 +28,16 @@ const Login = ({ onLogin }) => {
       <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} /><br /><br />
       <input placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} /><br /><br />
       <button onClick={handleLogin}>Login</button>
+      <br /><br />
+      <p>
+        Don't have an account?{" "}
+        <span
+          style={{ color: "blue", cursor: "pointer", textDecoration: "underline" }}
+          onClick={onSwitch}
+        >
+          Register here
+        </span>
+      </p>
     </div>
   );
 };
